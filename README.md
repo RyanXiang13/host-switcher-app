@@ -1,2 +1,6 @@
 # host-switcher-app
- a cross-platform app to switch local hosts files
+A cross-platform app to switch local hosts files
+
+npm install bower
+
+bower install bootstrap
