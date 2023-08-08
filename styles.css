@@ -1,0 +1,255 @@
+.main-flex-container {
+	height: 95vh;
+	width: 95vw;
+}
+
+#body {
+	background-color: #000;
+	resize: both;
+}
+
+
+#headers {
+	margin-top: 30px;
+	margin-left: 30px;
+	color: white;
+	font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+#operatingSys {
+	width: 20vw;
+}
+
+#fileInformation {
+	display: inline;	
+}
+
+#searchBar {
+	display: inline;
+	overflow: hidden;
+	
+	float: right;
+	clear: both;
+}
+
+#searchPath {
+	width: 50vw;
+	margin-left: 2vw;;
+}
+
+#uploadFolder {
+	width: 2.5vw;
+	margin-right: 3vw;
+	margin-bottom: 0.5vh;
+	padding: 0px;
+	height: 4.3vh;
+}
+
+#searchField {
+	width: 23.8vw;
+	margin-right: 0.3vw;
+}
+
+
+#curHostsFile {
+	color: #0275d8;
+}
+
+#currentView {
+	color: green;
+}
+
+.flex-container {
+	display: flex;
+	gap: 1rem;
+	flex-direction: row;
+	width: 95%;
+	margin-top: 30px;
+	margin-left: 50px;
+}
+
+#fileButtons {
+	font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	overflow: scroll;
+	overflow-x: hidden;
+	padding-left: 50px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	width: 30vw;
+	height: 70vh;
+	border-radius: 2%;
+	position: absolute;
+	right: 30px;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: black; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+	border-radius: 15px;
+  	background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+#fileButton {
+    width: 70%;
+}
+
+#fileContents {
+	color: white;
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 20px;
+}
+
+textarea {
+	position: relative;
+	width: 60vw;
+	height: 70vh;
+	padding: 12px 20px;
+	box-sizing: border-box;
+	color: green;
+	background-color: black;
+	outline: none;
+	border: none;
+}
+
+::-webkit-resizer {
+  display: none;
+}
+
+/* Button ripple effect*/
+
+.btn-ripple {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+	transition: all ease-in-out .005s;
+}
+
+.btn-ripple::after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 25%;
+	height: 100%;
+	width: 50%;
+	background-color: #000;
+	border-radius: 50%;
+	opacity: 0;
+	pointer-events: none;
+	transition: all ease-in-out 0.75s;
+	transform: scale(5, 5);
+}
+
+.btn-ripple:active::after {
+	padding: 0;
+	margin: 0;
+	opacity: .2;
+	transition: 0s;
+	transform: scale(0, 0);
+}
+
+
+/* file contents */
+.code {
+	background-color:#EEEEEE;
+	font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+}
+
+body {
+    font-family: sans-serif
+}
+
+.box-background {
+	background: rgba(0, 0, 0, 0.8);
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.box {
+	width: 300px;
+	height: 150px;
+	background: #fff;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	font-family: sans-serif;
+	font-size: small;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	border-radius: 5px;
+}
+
+.box div {
+	margin-top: 5px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+/* toggle in label designing */
+.toggle {
+	position : relative;
+	top: 6px;
+	right: 3px;
+	display : inline-block;
+	width : 2.6vw;
+	height : 2.6vh;
+	background-color: red;
+	border-radius: 30px;
+	border: 2px solid gray;
+}
+	   
+/* After slide changes */
+.toggle:after {
+	content: '';
+	position: absolute;
+	width: 1vw;
+	height: 1.9vh;
+	border-radius: 50%;
+	background-color: gray;
+	top: 0.14vh;
+	left: 0.21vw;
+	transition:  all 0.5s;
+}
+	   
+/* Toggle text */
+p {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
+}
+	   
+/* Checkbox checked effect */
+.checkbox:checked + .toggle::after {
+	left : 1.2vw;
+}
+	   
+/* Checkbox checked toggle label bg color */
+.checkbox:checked + .toggle {
+	background-color: green;
+}
+	   
+/* Checkbox vanished */
+.checkbox {
+	display : none;
+}
