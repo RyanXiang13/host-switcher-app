@@ -1,14 +1,15 @@
 const buttonsContainer = document.getElementById('fileButtons'); //Button div 
 const fileContent = document.getElementById('contents'); //Sleected file content pre element
-var directoryPath = '';
-var currentActiveButton = null;
-var currentActiveButton2 = null;
+var directoryPath = '//svdc2/shared/dev/Common/hosts'; // (global) current directory path
+var currentMainButton = null; // current selected main button (copy file button)
+var currentViewButton = null; // current selected view button
 var userOS; //User operating system
 
-var buttonsArray = [];
+var buttonsArray = []; // array with a div for each file (which contains three buttons each)
 
-window.electronAPI.getOS((event, os) => {
-    const description = document.getElementById('os');
+window.electronAPI.getOS((event, os) => { // get operating system 
+    const description = document.getElementById('os'); // get operating system description
+    // Change to appropriate operating system icon in DOM
     const osImg = document.getElementById('osImage');
     if (os === 'win32') {
         userOS = os;
@@ -25,13 +26,14 @@ window.electronAPI.getOS((event, os) => {
         osImg.src = './images/linux.png';
         os = 'Linux'
     }
-    description.innerHTML = os;
+    description.innerHTML = os; // set operating system description to os
 })
 
-async function createButton(file, i) {
-    const div = document.createElement('div');
-    div.id = 'div'+i;
+async function createButton(file, i) { // takes a file and index parameter, corresponding to the div's index within the buttons array
+    const div = document.createElement('div'); // create new div element
+    div.id = 'div'+i; // make div id to distinguish all file divs
 
+    // Create the toggle button (disable/enable) and assign properties
     const toggleVisibility = document.createElement('input');
     toggleVisibility.type = 'checkbox';
     toggleVisibility.checked = true;
@@ -42,6 +44,7 @@ async function createButton(file, i) {
     label.htmlFor = 'switch'+i;
     label.className = 'toggle'; 
     
+    // Create the copy file button and assign properties
     const button = document.createElement('button');
     const linebreak = document.createElement('br');
     button.innerText = file;
@@ -52,165 +55,148 @@ async function createButton(file, i) {
     button.type = 'button';
     button.disabled = false;
     
+    // Create the view button and assign properties
     const view = document.createElement('button');
     view.innerHTML = 'view';
     view.className = 'btn btn-outline-success';
     view.classList.add('btn.ripple');
     view.type = 'button';
-
+    
+    // Append all elements created to the div (linebreak is for separating the three buttons of each file)
     div.appendChild(toggleVisibility);
     div.appendChild(label);
     div.appendChild(button);
     div.appendChild(view);
     div.appendChild(linebreak);
 
-    buttonsContainer.appendChild(div);
-    buttonsArray.push(div);
+    buttonsContainer.appendChild(div); // Add div to the main div in DOM
+    buttonsArray.push(div); // Add div to the buttons array
 
-    toggleVisibility.addEventListener('change', () => {
-        if (toggleVisibility.checked) {
+    toggleVisibility.addEventListener('change', () => { // add an on change event to the toggle button
+        if (toggleVisibility.checked) { // green/checked
             setTimeout(() => {
-                button.disabled = false;
-                view.disabled = false;
-                buttonsContainer.removeChild(div);
-                buttonsContainer.prepend(div)
-            }, 500)
+                button.disabled = false; // enable copy file button
+                buttonsContainer.removeChild(div); // remove the old div from the DOM
+                buttonsContainer.prepend(div); // re-add the div to the beginning of the main div
+            }, 500) // allow the toggle transition to finish
+
         }
-        else {
+        else { // red/unchecked
             setTimeout(() => {
-                button.disabled = true;
-                view.disabled = true;
-                buttonsContainer.removeChild(div);
-                buttonsContainer.appendChild(div)
-            }, 500)
+                button.disabled = true; // disable copy file button
+                buttonsContainer.removeChild(div); // remove the old div fromt he DOM
+                buttonsContainer.appendChild(div); // add the new div to the end of the main div
+            }, 500) // allow the toggle transition to finish
         }
     })
 
-    // Add event listener to the file button
-    button.addEventListener('click', async () => {
-        myConfirmBox(file).then((response) => {
-            if (response === true) {
-                window.electronAPI.copyFile(directoryPath+'/'+file);
-                if (currentActiveButton == null) {
-                    currentActiveButton = button;
+    // Add event listener to the copy file button
+    button.addEventListener('click', async () => { // on click execute asynchronous function
+        myConfirmBox(file).then((response) => { // get response from a pop up
+            if (response === true) { // user clicks proceed
+                window.electronAPI.copyFile(directoryPath+'/'+file); // trigger copy file function in main
+                if (currentMainButton == null) { // no current main button has been set yet
+                    currentMainButton = button; // set current main button to this button
                 }
-                if (!button.classList.contains('active')) {
-                    currentActiveButton.classList.remove('active');
-                    currentActiveButton = button;
-                    button.classList.add('active');
+                if (!button.classList.contains('active')) { // copy file button is not active/enabled
+                    currentMainButton.classList.remove('active'); // remove active status of current main button
+                    currentMainButton = button; // set current main button to this button
+                    currentMainButton.classList.add('active'); // set current main button to active
                 }
-                document.getElementById('curHostsFile').innerText = file;
-                document.getElementById('filePath').innerText = directoryPath+'/'+file;
-                view.click();
+                view.click(); // trigger the view button
             }
         });
     })
 
-    view.addEventListener('click', async () => {
-        const contents = await window.electronAPI.readFile(directoryPath, file);
+    // Add event listener to the view file button
+    view.addEventListener('click', async () => {  // on click execute asnchronous function
+        const contents = await window.electronAPI.readFile(directoryPath, file); // get contents of file from callback after executing read file function in main
 
-        if (currentActiveButton2 == null) {
-            currentActiveButton2 = view;
+        if (contents === 'Error while reading contents.\nEnsure you have selected a file and not a folder!') { // error reading contents
+            document.getElementById('curHostsFile').innerText = ''; // change current hosts file text in DOM to nothing because copy file function does not execute
         }
-        if (!view.classList.contains('active')) {
-            currentActiveButton2.classList.remove('active');
-            currentActiveButton2 = view;
-            view.classList.add('active');
+        else {
+            document.getElementById('curHostsFile').innerText = file; // change current hosts file text in DOM
+        }
+        if (currentViewButton == null) { // no current view button has been set yet
+            currentViewButton = view; // set current view button to this view button
+        }
+        if (!view.classList.contains('active')) { // view file button is not avtive/enabled
+            currentViewButton.classList.remove('active'); // remove active status of current view button
+            currentViewButton = view; // set current view button to this view button
+            currentViewButton.classList.add('active'); // set current view button to active
         }
             
-        fileContent.innerHTML = contents;
-        document.getElementById('currentView').innerHTML = `Currently viewing <em>${file}</em>`
-            
+        fileContent.innerHTML = contents; // change the text element in DOM to file contents
+        document.getElementById('currentView').innerHTML = `Currently viewing <em>${file}</em>` // tell users what file is being displayed
     })
 }
 
-
-function myConfirmBox(replacementFile) {
-    let element = document.createElement("div");
-    element.classList.add("box-background");
-    element.innerHTML = `<div class="box"> 
+function myConfirmBox(replacementFile) { // confirmation window before executing the copy file function in main
+    let element = document.createElement("div"); // create a new div
+    element.classList.add("box-background"); // add class name
+    // add the html of the div
+    element.innerHTML = `<div class="box">
                             <div>
                                 You are replacing your local hosts file with <br><strong>${replacementFile}</strong><br><br>
                                 <button type="button" class="btn btn-outline-success" id="trueButton"">Proceed</button>
                                 <button type="button" class="btn btn-outline-danger" id="falseButton">Cancel</button>
                             </div>
                           </div>`;
-    document.body.appendChild(element);
-    return new Promise(function (resolve, reject) {
+    document.body.appendChild(element); // add this div to the end of the DOM body
+    return new Promise(function (resolve, reject) { 
       document
-        .getElementById("trueButton")
-        .addEventListener("click", function () {
-          resolve(true);
-          document.body.removeChild(element);
+        .getElementById("trueButton") // get true button element
+        .addEventListener("click", function () { // click on 'Proceed'
+          resolve(true); // return true
+          document.body.removeChild(element); // remove the confirmation box div
         });
       document
-        .getElementById("falseButton")
-        .addEventListener("click", function () {
-          resolve(false);
-          document.body.removeChild(element);
+        .getElementById("falseButton") // get false button element
+        .addEventListener("click", function () { // click on 'Cancel'
+          resolve(false); // return false
+          document.body.removeChild(element); // remove the confirmation box div
         });
     });
 }
 
 /* Search Field */
 
-const searchField = document.getElementById('searchField');
-searchField.addEventListener('input', () => {
-    
-    const input = document.getElementById('searchField').value.toLowerCase();
-    buttonsArray.forEach((div) => {
-        if (div.children[2].innerText.toLowerCase().includes(input)) {
-            
-            div.style.display = '';
+const searchField = document.getElementById('searchField'); // get search field input element
+searchField.addEventListener('input', () => { // add event listener to detect changes in in the input field contents 
+    const input = document.getElementById('searchField').value.toLowerCase(); // get the input field contents and lower case for non case-sensitive searching
+    buttonsArray.forEach((div) => { // loop through each div in buttons array
+        if (div.children[2].innerText.toLowerCase().includes(input)) { // 3rd element in div (copy file button with filename as the text) in lower case includes part or all of the input so far
+            div.style.display = ''; // keep the display of matching divs
         }
         else {
-            div.style.display = 'none';
+            div.style.display = 'none'; // hide the display of non-matching divs
         }
     })
-    
 })
 
-const uploadButton = document.getElementById('uploadFolder');
+const uploadButton = document.getElementById('uploadFolder'); // get the upload button (Go button) element
 
-uploadButton.addEventListener('click', async () => {
-    directoryPath = document.getElementById('searchPath').value;
-    console.log(directoryPath);
-    const fileNames = await window.electronAPI.loadFolder(directoryPath);
-    console.log(fileNames);
+uploadButton.addEventListener('click', async () => { // add event listener on click to the upload button
+    directoryPath = document.getElementById('searchPath').value; // get the directory path value from the search field input right before clicking the button
+    const fileNames = await window.electronAPI.loadFolder(directoryPath); // send the directory path to main and store result in constant array
 
-    buttonsContainer.innerHTML = '';
-    for (let i=0;i<fileNames.length;i++) {
-        createButton(fileNames[i], i);
+    buttonsContainer.innerHTML = ''; // clear the current buttons container when loading in a new directory
+    for (let i=0;i<fileNames.length;i++) { // loop through each file in newly loaded directory
+        createButton(fileNames[i], i); // create a button for each file
     }
 })
 
-/*
-uploadButton.addEventListener('click', () => {
-    directoryPath = document.getElementById('searchPath').value;
-    window.electronAPI.loadFolder(directoryPath);
+// Initial load (hardcoded)
+async function initialLoad() {
+    const initialFileNames = await window.electronAPI.loadFolder(directoryPath); // send the directory path to main and store result in constant array
+    console.log(initialFileNames)
+    buttonsContainer.innerHTML = ''; // clear the current buttons container when loading in a new directory
+    for (let i=0;i<initialFileNames.length;i++) { // loop through each file in newly loaded directory
+        createButton(initialFileNames[i], i); // create a button for each file
+    }
+}
 
-    /* Getting all file names in directory
-    and storing in a string array */
-/*
-    let fileNames = [];
-    
-    window.electronAPI.getFiles((event, array) => {
-        fileNames = [...array];
-        fileNames.sort();
-        console.log(fileNames);
-    })
-
-    setTimeout(() => {
-        console.log('hello');
-        for (let i=0;i<fileNames.length;i++) {
-            createButton(fileNames[i], i);
-        }
-    }, 1000); // Could replace with ipcRenderer.sendSync but no need since file is not large
-
-// 2way renderer to main
-// send the path, make one async function in main to get all files and then return the file names
+initialLoad();
 
 
-*/
-
-    
