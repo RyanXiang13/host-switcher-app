@@ -3,7 +3,7 @@ const path = require('path'); // get node path module
 const fs = require('fs'); // get node file system module for windows OS file changes
 const cp = require('child_process'); // get node child processes to execute shell commands
 
-/*
+
 const ignored1 = /node_modules|[/\\]\./;
 const ignored2 = /temp|[/\\]\./; 
 const ignored3 = /HostMaster[/\\]\./;
@@ -12,16 +12,13 @@ const ignored3 = /HostMaster[/\\]\./;
 // changes to app on save
 
 const electronReload = require('electron-reload'); // module to automatically reload electron app on save
+const { dir } = require('console');
 
 require('electron-reload')(__dirname, {
     electron: path.join(__dirname, 'node_modules', 'electron', 'dist', 'electron.exe'),
     ignored: [ignored1, ignored2, ignored3],
     hardResetMethod: 'exit'
 })
-*/
-
-/* Load all files in Host Master folder */
-var fileNames = []; 
 
 // if there are special instructions for loading, reading, or copying files
 // on mac and linux, set the functions differently
@@ -47,22 +44,25 @@ else if (process.platform === 'linux') {
 }
 
 // asynchronous load folder function using fs node module
-loadFolder = async function(path) { 
+loadFolder = async function(dirPath) { 
   // try catch to prevent runtime error
+  var filteredFileNames = [];
   try {
-    fileNames = fs.readdirSync(path, (err, files) => { // read directory synchronously so all files load at once
+    fileNames = fs.readdirSync(dirPath, (err, files) => { // read directory synchronously so all files load at once
       if (err) {
-          console.log(err);
-      }
-      else {
-          files.forEach(file => {
-            fileNames.push(file);  // add all files read to an array
-          })
+          console.log(err); // output error
       }
     })
-    return fileNames; // return an array of all files
+    fileNames.forEach(file => { // loop through each file in the array
+      if (path.extname(path.join(dirPath, file)) === '') { // the extension name of the absolute path of the file or folder has no extension (of type file)
+        if (fs.lstatSync(path.join(dirPath, file)).isFile()) { // further check if the file or folder is a file
+          filteredFileNames.push(file); // only add the file with no extension
+        }        
+      }
+    });
+    return filteredFileNames; // return an array of all files
   } catch (err) { 
-      console.log(err);
+      console.log(err); // output error
   }
 }
 
@@ -162,7 +162,9 @@ const createWindow = (width, height) => {
   
   /*  Menu customization if additional features were to be added,
       such as a refresh or editing button */  
-  
+  if (BrowserWindow.getAllWindows() === 1) {
+    return;
+  }
   const menu = Menu.buildFromTemplate([]); // menu editing
   Menu.setApplicationMenu(menu);
 
@@ -172,8 +174,8 @@ const createWindow = (width, height) => {
   });
   
   mainWindow.webContents.on('did-finish-load', function () { // wait until the page is ready to send the message    
-    mainWindow.webContents.send('readDirectory', fileNames); // send fileNames array through the 'readDirectory' channel
     mainWindow.webContents.send('OS', process.platform); // send the OS name through the 'OS' channel
+    mainWindow.webContents.send('initialPath', fs.readFileSync('./initialPath.txt', 'utf-8')); // send the initial path through the '
    });
   mainWindow.loadFile('index.html'); // Renderer process entrypoint
   

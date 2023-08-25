@@ -80,6 +80,7 @@
 	font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 	overflow: scroll;
 	overflow-x: hidden;
+	padding-left: 50px;
 	padding-top: 10px;
 	padding-bottom: 10px;
 	width: 30vw;

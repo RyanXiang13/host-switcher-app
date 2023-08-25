@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('electronAPI', { // initialize context bridge ca
     loadFolder: (path) => ipcRenderer.invoke('loadFolder', path), // trigger load folder function in main and return array of files
     copyFile: (oldPath) => ipcRenderer.send('copyFile', oldPath), // trigger copy file function in main
     readFile: (path, fileName) => ipcRenderer.invoke('readFile', path, fileName), // trigger read file function in main and return file contents
-    getOS: (callback) => ipcRenderer.on('OS', callback) // get the operating system string from main
+    getOS: (callback) => ipcRenderer.on('OS', callback), // get the operating system string from main
+    getInitialPath: (callback) => ipcRenderer.on('initialPath', callback), // get the initial path from main
 })

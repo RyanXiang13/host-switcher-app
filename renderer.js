@@ -1,6 +1,6 @@
 const buttonsContainer = document.getElementById('fileButtons'); //Button div 
 const fileContent = document.getElementById('contents'); //Sleected file content pre element
-var directoryPath = '//svdc2/shared/dev/Common/hosts'; // (global) current directory path
+var directoryPath = ''; // (global) current directory path
 var currentMainButton = null; // current selected main button (copy file button)
 var currentViewButton = null; // current selected view button
 var userOS; //User operating system
@@ -187,16 +187,14 @@ uploadButton.addEventListener('click', async () => { // add event listener on cl
     }
 })
 
-// Initial load (hardcoded)
-async function initialLoad() {
+// Initial load (hardcoded in config file - initialPath.txt)
+window.electronAPI.getInitialPath( async (event, initialPath) => { // get operating system
+    directoryPath = initialPath;
     const initialFileNames = await window.electronAPI.loadFolder(directoryPath); // send the directory path to main and store result in constant array
-    console.log(initialFileNames)
     buttonsContainer.innerHTML = ''; // clear the current buttons container when loading in a new directory
     for (let i=0;i<initialFileNames.length;i++) { // loop through each file in newly loaded directory
         createButton(initialFileNames[i], i); // create a button for each file
     }
-}
-
-initialLoad();
+})
 
 
